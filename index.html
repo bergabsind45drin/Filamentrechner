@@ -12,6 +12,9 @@
         --accent:#4caf50;
         --text:#e8e8e8;
         --muted:#a0a0a0;
+
+        --highlight:#1f2a3a;
+        --highlight-border:#3a4a66;
     }
 
     *{
@@ -69,6 +72,11 @@
         border-color:var(--accent);
     }
 
+    .highlight{
+        background:var(--highlight) !important;
+        border:1px solid var(--highlight-border) !important;
+    }
+
     button{
         width:100%;
         margin-top:16px;
@@ -112,19 +120,19 @@
 
     <div class="card">
 
-        <label>Rollen-Gewicht auswählen</label>
-        <select id="preset" onchange="setPreset()">
+        <label>Rollen-Gewicht (Standard)</label>
+        <select id="preset" class="highlight" onchange="setPreset()">
             <option value="1">1 kg (Standard)</option>
             <option value="0.5">0.5 kg</option>
             <option value="2">2 kg</option>
             <option value="3">3 kg</option>
         </select>
 
-        <label>Innendurchmesser Hülse (cm)</label>
-        <input id="inner" type="number" step="0.1" oninput="calc()">
-
         <label>Außendurchmesser (inkl. Filament, außen gemessen) (cm)</label>
         <input id="outer" type="number" step="0.1" oninput="calc()">
+
+        <label>Innendurchmesser Hülse (cm)</label>
+        <input id="inner" type="number" step="0.1" oninput="calc()">
 
         <label>Rollenbreite (cm)</label>
         <input id="width" type="number" step="0.1" oninput="calc()">
@@ -143,7 +151,7 @@
 
         <button onclick="calc()">Berechnen</button>
 
-        <div class="result" id="result">Ergebnis erscheint hier</div>
+        <div class="result" id="result">Länge wird berechnet …</div>
 
     </div>
 
@@ -155,25 +163,17 @@ function setPreset(){
 
     const val = parseFloat(document.getElementById("preset").value);
 
-    if(val === 0.5){
-        setValues(5, 18, 5.5);
-    }
-    if(val === 1){
-        setValues(5.5, 20, 6);
-    }
-    if(val === 2){
-        setValues(6, 24, 7);
-    }
-    if(val === 3){
-        setValues(6.5, 28, 8);
-    }
+    // nur Innen & Breite setzen, Außen bleibt leer!
+    if(val === 0.5) setValues(5, 5.5);
+    if(val === 1)   setValues(5.5, 6);
+    if(val === 2)   setValues(6, 7);
+    if(val === 3)   setValues(6.5, 8);
 
     calc();
 }
 
-function setValues(inner, outer, width){
+function setValues(inner, width){
     document.getElementById("inner").value = inner;
-    document.getElementById("outer").value = outer;
     document.getElementById("width").value = width;
 }
 
@@ -185,6 +185,7 @@ function calc(){
     const filament = parseFloat(document.getElementById("filament").value);
     const density = parseFloat(document.getElementById("material").value);
 
+    // Außen MUSS manuell sein
     if(!inner || !outer || !width || !filament) return;
 
     const r1 = inner/2;
