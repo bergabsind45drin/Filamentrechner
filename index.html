@@ -87,7 +87,19 @@
     }
 
     .result{
-        display:none;
+        margin-top:16px;
+        padding:14px;
+        border-radius:12px;
+        background:#0e1420;
+        border:1px solid #2a3246;
+        font-size:15px;
+    }
+
+    .big{
+        font-size:22px;
+        font-weight:700;
+        display:block;
+        margin-top:6px;
     }
 </style>
 </head>
@@ -100,34 +112,71 @@
 
     <div class="card">
 
-        <label>Innendurchmesser Hülse (cm)</label>
-        <input id="inner" type="number" step="0.1">
+        <label>Rollen-Gewicht auswählen</label>
+        <select id="preset" onchange="setPreset()">
+            <option value="1">1 kg (Standard)</option>
+            <option value="0.5">0.5 kg</option>
+            <option value="2">2 kg</option>
+            <option value="3">3 kg</option>
+        </select>
 
-        <label>Außendurchmesser Rolle (cm)</label>
-        <input id="outer" type="number" step="0.1">
+        <label>Innendurchmesser Hülse (cm)</label>
+        <input id="inner" type="number" step="0.1" oninput="calc()">
+
+        <label>Außendurchmesser (inkl. Filament, außen gemessen) (cm)</label>
+        <input id="outer" type="number" step="0.1" oninput="calc()">
 
         <label>Rollenbreite (cm)</label>
-        <input id="width" type="number" step="0.1">
+        <input id="width" type="number" step="0.1" oninput="calc()">
 
         <label>Filamentdurchmesser</label>
-        <select id="filament">
+        <select id="filament" onchange="calc()">
             <option value="1.75">1.75 mm</option>
             <option value="2.85">2.85 mm</option>
         </select>
 
         <label>Material</label>
-        <select id="material">
+        <select id="material" onchange="calc()">
             <option value="1.24">PLA</option>
             <option value="1.27">PETG</option>
         </select>
 
         <button onclick="calc()">Berechnen</button>
 
+        <div class="result" id="result">Ergebnis erscheint hier</div>
+
     </div>
 
 </div>
 
 <script>
+
+function setPreset(){
+
+    const val = parseFloat(document.getElementById("preset").value);
+
+    if(val === 0.5){
+        setValues(5, 18, 5.5);
+    }
+    if(val === 1){
+        setValues(5.5, 20, 6);
+    }
+    if(val === 2){
+        setValues(6, 24, 7);
+    }
+    if(val === 3){
+        setValues(6.5, 28, 8);
+    }
+
+    calc();
+}
+
+function setValues(inner, outer, width){
+    document.getElementById("inner").value = inner;
+    document.getElementById("outer").value = outer;
+    document.getElementById("width").value = width;
+}
+
 function calc(){
 
     const inner = parseFloat(document.getElementById("inner").value);
@@ -151,8 +200,14 @@ function calc(){
     const lengthCm = (mass*1000/density) / areaF;
     const meters = lengthCm / 100;
 
-    alert(`📏 ${meters.toFixed(0)} Meter`);
+    document.getElementById("result").innerHTML = `
+        📏 Länge:<span class="big">${meters.toFixed(0)} m</span>
+        ⚖️ Gewicht: <b>${mass.toFixed(2)} kg</b>
+    `;
 }
+
+setPreset();
+
 </script>
 
 </body>
